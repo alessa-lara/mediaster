@@ -1,0 +1,241 @@
+# BASED ON https://github.com/navilg/media-stack
+
+name: media-server
+services:
+  # VPN
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    hostname: media-server
+    environment:
+      - TS_AUTHKEY=${TS_AUTH_SERVER}
+    cap_add:
+      - net_admin
+    ports:
+      - 80:7575   # homarr
+      - 5080:5080 # qbit
+      - 7476:7476 # qui
+      - 7878:7878 # radarr
+      - 7879:7879 # radarr-anime
+      - 8989:8989 # sonarr
+      - 8990:8990 # sonarr-anime
+      - 6767:6767 # bazarr
+      - 6768:6768 # bazarr-anime
+      - 9696:9696 # prowlarr
+      - 5055:5055 # jellyseerr
+      - 8096:8096 # jellyfin
+      - 25600:25600 # komga
+      - 8090:8090 # mylar3
+    volumes:
+      - ./data/tailscale-config:/var/lib
+      - /dev/net/tun:/dev/net/tun
+    restart: always
+
+  # MEDIA DOWNLOAD
+  qui:
+    image: ghcr.io/autobrr/qui:latest
+    network_mode: service:tailscale
+    container_name: qui
+    volumes:
+      - ./data/qui-config:/config
+    environment:
+      - TZ=UTC
+    restart: always
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: linuxserver/qbittorrent:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+      - WEBUI_PORT=5080
+    volumes:
+      - ./data/qbittorrent-config:/config
+      - ./data/media-files/downloads:/data/downloads
+    restart: always
+
+  # MANGA - COMICS
+  mylar3:
+    image: lscr.io/linuxserver/mylar3:latest
+    container_name: mylar3
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/mylar3-config:/config
+      - ./data/media-files/library/books:/books
+      - ./data/media-files/downloads:/downloads
+    restart: unless-stopped
+
+  # MOVIES
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ./data/radarr-config:/config
+      - ./data/media-files:/data
+    restart: always
+
+  # ANIME MOVIES
+  radarr-anime:
+    container_name: radarr-anime
+    image: linuxserver/radarr:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ./data/radarr-anime-config:/config
+      - ./data/media-files:/data
+    restart: always
+
+  # SERIES
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ./data/sonarr-config:/config
+      - ./data/media-files:/data
+    restart: always
+
+  # ANIME SHOWS
+  sonarr-anime:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr-anime
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ./data/sonarr-anime-config:/config
+      - ./data/media-files:/data
+    restart: always
+
+  # MANGA
+  komga:
+    image: gotson/komga
+    container_name: komga
+    network_mode: service:tailscale
+    user: "1000:100"
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./data/komga-config:/config
+      - ./data/media-files/:/data
+    restart: unless-stopped
+
+  # SUBTITLES
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:development
+    container_name: bazarr
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/bazarr-config:/config
+      - ./data/media-files:/data
+    restart: always
+
+  bazarr-anime:
+    image: lscr.io/linuxserver/bazarr:development
+    container_name: bazarr-anime
+    network_mode: service:tailscale
+    security_opt:
+      - no-new-privileges=true
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - ./data/bazarr-anime-config:/config
+      - ./data/media-files:/data
+    restart: always
+
+  # INDEXERS
+  prowlarr:
+    container_name: prowlarr
+    image: linuxserver/prowlarr:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ./data/prowlarr-config:/config
+    restart: always
+
+  # TRaSH CONFIG
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:latest
+    container_name: recyclarr
+    network_mode: service:tailscale
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./data/recyclarr-config:/config
+    restart: always
+
+  # REQUESTS
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    network_mode: service:tailscale
+    environment:
+      - TZ=UTC
+    volumes:
+      - ./data/jellyseerr-config:/app/config
+    restart: always
+
+  # MEDIA LIBRARY
+  jellyfin:
+    image: linuxserver/jellyfin:latest
+    container_name: jellyfin
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ./data/jellyfin-config:/config
+      - ./data/media-files/library:/library
+    restart: always
+
+  # HOMEPAGE
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    network_mode: service:tailscale
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_ENCRYPT_KEY}
+    volumes:
+      - /run/user/1000/docker.sock:/var/run/docker.sock
+      - ./data/homarr-config/appdata:/appdata
+    restart: always
+
+  # DOCKER MANAGEMENT
+  # yacht:
+  #   image: selfhostedpro/yacht:latest
+  #   container_name: yacht
+  #   network_mode: service:tailscale
+  #   volumes:
+  #     - ./data/yacht-config:/config
+  #     - /run/user/1000/docker.sock:/var/run/docker.sock
+  #   restart: unless-stopped
