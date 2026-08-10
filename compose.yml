@@ -7,7 +7,6 @@ services:
     image: tailscale/tailscale:latest
     container_name: tailscale
     hostname: media-server
-    user: "1000:100"
     environment:
       - TS_AUTHKEY=${TS_AUTH_SERVER}
     cap_add:
@@ -69,8 +68,7 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ./data/mylar3-config:/config
-      - ./data/media-files/library/books:/books
-      - ./data/media-files/downloads:/downloads
+      - ./data/media-files:/media-files
     restart: unless-stopped
 
   # MOVIES
