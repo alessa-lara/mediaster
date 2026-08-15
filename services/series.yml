@@ -1,0 +1,28 @@
+services:
+  # SERIES
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ../data/sonarr-config:/config
+      - ../data/media-files:/data
+    restart: always
+
+  # ANIME SHOWS
+  sonarr-anime:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr-anime
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ../data/sonarr-anime-config:/config
+      - ../data/media-files:/data
+    restart: always

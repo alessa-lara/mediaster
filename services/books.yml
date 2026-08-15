@@ -1,0 +1,57 @@
+services:
+  grimmory:
+    image: ghcr.io/grimmory-tools/grimmory:nightly
+    container_name: grimmory
+    environment:
+      - USER_ID=1000
+      - GROUP_ID=100
+      - TZ=Etc/UTC
+      - DATABASE_URL=jdbc:mariadb://mariadb:3306/grimmory
+      - DATABASE_USERNAME=grimmory
+      - DATABASE_PASSWORD=your_secure_password
+      - SWAGGER_ENABLED=false
+      - FORCE_DISABLE_OIDC=false
+      # - JDK_JAVA_OPTIONS=-Xmx256m
+      # - JDK_JAVA_OPTIONS=-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app/data
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    network_mode: service:tailscale
+    volumes:
+      - ../data/grimmory-config:/app/data
+      - ../data/media-files/library/books:/books
+      - ../data/media-files/downloads/bookdrop:/bookdrop
+    restart: unless-stopped
+
+  # grimmory dependency
+  mariadb:
+    image: lscr.io/linuxserver/mariadb:11.4.8
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+      - MYSQL_ROOT_PASSWORD=super_secure_password
+      - MYSQL_DATABASE=grimmory
+      - MYSQL_USER=grimmory
+      - MYSQL_PASSWORD=your_secure_password
+    volumes:
+      - ../data/mariadb-config:/config
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mariadb-admin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ebook downloader
+  shelfmark:
+    image: ghcr.io/calibrain/shelfmark:dev
+    container_name: shelfmark
+    network_mode: service:tailscale
+    environment:
+      PUID: 1000
+      PGID: 100
+    volumes:
+      - ./data/media-files:/media-files
+      - ./data/shelfmark:/config
+    restart: unless-stopped

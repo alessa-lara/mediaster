@@ -1,0 +1,28 @@
+services:
+  # REQUESTS
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    network_mode: service:tailscale
+    user: "1000:100"
+    environment:
+      - TZ=UTC
+    volumes:
+      - ../data/jellyseerr-config:/app/config
+    restart: always
+
+  # MEDIA LIBRARY
+  jellyfin:
+    image: linuxserver/jellyfin:latest
+    container_name: jellyfin
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+      # - NVIDIA_VISIBLE_DEVICES=all # enable if you need nvidia
+    volumes:
+      - ../data/jellyfin-config:/config
+      - ../data/media-files/library:/library
+    # runtime: nvidia # enable if you need nvidia
+    restart: always

@@ -1,0 +1,26 @@
+services:
+  qui:
+    image: ghcr.io/autobrr/qui:latest
+    container_name: qui
+    network_mode: service:tailscale
+    user: "1000:100"
+    volumes:
+      - ../data/qui-config:/config
+    environment:
+      - TZ=UTC
+    restart: always
+
+  qbittorrent:
+    container_name: qbittorrent
+    image: linuxserver/qbittorrent:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+      - WEBUI_PORT=5080
+    volumes:
+      - ../data/qbittorrent-config:/config
+      - ../data/media-files/downloads:/data/downloads
+    restart: always
+

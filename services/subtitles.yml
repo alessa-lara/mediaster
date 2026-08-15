@@ -1,0 +1,26 @@
+services:
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:development
+    container_name: bazarr
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - ../data/bazarr-config:/config
+      - ../data/media-files:/data
+    restart: always
+
+  bazarr-anime:
+    image: lscr.io/linuxserver/bazarr:development
+    container_name: bazarr-anime
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - ../data/bazarr-anime-config:/config
+      - ../data/media-files:/data
+    restart: always

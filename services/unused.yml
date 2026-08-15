@@ -1,0 +1,38 @@
+services:
+  # MANGA - COMICS
+  # mylar3:
+  #   image: lscr.io/linuxserver/mylar3:latest
+  #   container_name: mylar3
+  #   network_mode: service:tailscale
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=100
+  #     - TZ=Etc/UTC
+  #   volumes:
+  #     - ./data/mylar3-config:/config
+  #     - ./data/media-files:/media-files
+  #   restart: unless-stopped
+
+  # # MANGA
+  # komga:
+  #   image: gotson/komga
+  #   container_name: komga
+  #   network_mode: service:tailscale
+  #   user: "1000:100"
+  #   environment:
+  #     - TZ=UTC
+  #    # - JAVA_TOOL_OPTIONS=-Xmx4g  # enable if komga ever runs out of memory
+  #   volumes:
+  #     - ./data/komga-config:/config
+  #     - ./data/media-files/:/data
+  #   restart: unless-stopped
+  #
+  # DOCKER MANAGEMENT
+  # yacht:
+  #   image: selfhostedpro/yacht:latest
+  #   container_name: yacht
+  #   network_mode: service:tailscale
+  #   volumes:
+  #     - ./data/yacht-config:/config
+  #     - /run/user/1000/docker.sock:/var/run/docker.sock
+  #   restart: unless-stopped

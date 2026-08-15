@@ -1,0 +1,28 @@
+services:
+  # MOVIES
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ../data/radarr-config:/config
+      - ../data/media-files:/data
+    restart: always
+
+  # ANIME MOVIES
+  radarr-anime:
+    container_name: radarr-anime
+    image: linuxserver/radarr:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ../data/radarr-anime-config:/config
+      - ../data/media-files:/data
+    restart: always

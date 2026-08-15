@@ -2,3 +2,4 @@ permission-fix.sh
 start.sh
 .env
 data
+.vim

@@ -1,0 +1,37 @@
+services:
+  # INDEXERS
+  prowlarr:
+    container_name: prowlarr
+    image: linuxserver/prowlarr:latest
+    network_mode: service:tailscale
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=UTC
+    volumes:
+      - ../data/prowlarr-config:/config
+    restart: always
+
+  # TRaSH CONFIG
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:8
+    container_name: recyclarr
+    network_mode: service:tailscale
+    user: "1000:100"
+    environment:
+      - TZ=UTC
+    volumes:
+      - ../data/recyclarr-config:/config
+    restart: always
+
+  # HOMEPAGE
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    network_mode: service:tailscale
+    environment:
+      - SECRET_ENCRYPTION_KEY=${HOMARR_ENCRYPT_KEY}
+    volumes:
+      - /run/user/1000/docker.sock:/var/run/docker.sock
+      - ../data/homarr-config/appdata:/appdata
+    restart: always
